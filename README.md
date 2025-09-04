@@ -1,5 +1,9 @@
 # MCP — Universal Business Document Q\&A Copilot
 
+![MCP Demo Video](resources/videos/short_demo.mp4)
+
+* Watch the detailed demo below
+
 **MCP** is a Universal Business Document Q\&A Copilot that allows users to upload business documents (PDFs, scanned images) and ask natural language questions. The system uses OCR, paragraph segmentation, vector embeddings, and LLMs to provide accurate answers with precise references (page, paragraph).
 
 ## Features
