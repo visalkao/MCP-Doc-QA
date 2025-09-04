@@ -1,6 +1,10 @@
 # MCP — Universal Business Document Q\&A Copilot
 
-![MCP Demo Video](resources/videos/short_demo.mp4)
+
+
+https://github.com/user-attachments/assets/9b056f0e-8f92-451b-8397-ee41df072fea
+
+
 
 * Watch the detailed demo below
 
