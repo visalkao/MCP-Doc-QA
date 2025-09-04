@@ -1,4 +1,4 @@
-# MCP — Universal Business Document Q\&A Copilot
+# AI-Agents-based - Universal Business Document Q\&A Copilot (UBD)
 
 
 
@@ -8,7 +8,7 @@ https://github.com/user-attachments/assets/9b056f0e-8f92-451b-8397-ee41df072fea
 
 * Watch the detailed demo below
 
-**MCP** is a Universal Business Document Q\&A Copilot that allows users to upload business documents (PDFs, scanned images) and ask natural language questions. The system uses OCR, paragraph segmentation, vector embeddings, and LLMs to provide accurate answers with precise references (page, paragraph).
+**UBD** is a Universal Business Document Q\&A Copilot that allows users to upload business documents (PDFs, scanned images) and ask natural language questions. The system uses OCR, paragraph segmentation, vector embeddings, and LLMs to provide accurate answers with precise references (page, paragraph).
 
 ## Features
 
