@@ -40,13 +40,19 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 def classify_intent(query: str) -> str:
     """
-    Decide whether to answer using PDF context (FAISS) or just chat.
-    Returns 'pdf' or 'chat'.
+    Decide whether to answer using:
+      - 'chat': no document context
+      - 'pdf_rag': targeted PDF vector search (QA style)
+      - 'pdf_full': full document context (summarization, themes, whole doc tasks)
     """
-    # Simple prompt for small LLM
     prompt = f"""
-You are an assistant that decides whether a question requires consulting a PDF document or can be answered directly.
-Answer with only 'pdf' or 'chat'.
+You are an assistant that decides how to answer a user query.
+Options:
+- 'chat': The question does not require the PDF at all.
+- 'pdf_rag': The question requires consulting specific parts of the PDF (e.g. facts, details, page references).
+- 'pdf_full': The question asks for a summary, overview, or holistic analysis of the entire PDF.
+
+Answer with only one of: chat, pdf_rag, or pdf_full
 
 Question: {query}
 Answer:
@@ -59,40 +65,25 @@ Answer:
             temperature=0.0,
         )
         decision = resp.choices[0].message.content.strip().lower()
-        if decision not in ["pdf", "chat"]:
+        print("DEcision = ", decision)
+        if decision not in ["chat", "pdf_rag", "pdf_full"]:
             return "chat"
         return decision
     except Exception:
-        # fallback to keyword-based
-        doc_keywords = ["invoice", "report", "page", "document", "paragraph"]
-        return "pdf" if any(k in query.lower() for k in doc_keywords) else "chat"
-
-# @app.get('/query')
-# async def query(q: str):
-#     try:
-#         decision = classify_intent(q)
-
-#         if decision == "chat":
-            
-#             return {"answer": "Hello! I'm here to help with general questions.", "sources": []}
-
-#         # Otherwise, use FAISS / PDF agent
-#         from app.agents.qa_agent import answer_query
-#         res = answer_query(q, store, top_k=settings.TOP_K)
-#         return res
-
-#     except Exception as e:
-#         raise HTTPException(500, str(e))
-
+        # fallback keyword heuristic
+        q = query.lower()
+        if any(k in q for k in ["summary", "summarize", "overview", "whole document", "themes", "key points"]):
+            return "pdf_full"
+        elif any(k in q for k in ["invoice", "report", "page", "document", "paragraph"]):
+            return "pdf_rag"
+        return "chat"
 
 @app.get('/query')
 async def query(q: str):
     try:
         decision = classify_intent(q)
-
+        print(decision)
         if decision == "chat":
-            # Use OpenAI LLM to answer general questions
-
             prompt = f"""
 You are a helpful assistant. Answer the question as concisely as possible.
 
@@ -113,14 +104,19 @@ Answer:
                 answer = f"Could not generate answer: {str(e)}"
 
             return {"answer": answer, "sources": []}
-
-        # Otherwise, use FAISS / PDF agent
-        from app.agents.qa_agent import answer_query
-        res = answer_query(q, store, top_k=settings.TOP_K)
-        return res
-
+        elif decision == "pdf_rag":
+            # 'pdf_rag': use vector searches to find the best match
+            from app.agents.qa_agent import answer_query
+            res = answer_query(q, store, top_k=settings.TOP_K)
+            return res
+        else: 
+            # 'pdf_full': use all snippets for full context
+            from app.agents.qa_agent import answer_query
+            res = answer_query(q, store, top_k=settings.TOP_K, use_rag=False)
+            res = {'answer': res["answer"], 'sources': []}
+            return res
     except Exception as e:
-        raise HTTPException(500, str(e))
+        return {'answer': f'Error retrieving full context: {str(e)}', 'sources': []}
 
 
 if __name__ == "__main__":

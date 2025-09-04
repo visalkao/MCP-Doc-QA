@@ -26,6 +26,12 @@ class FaissStore:
                     row.append((self.metadatas[id_], float(D[row_idx][list(ids).index(id_)])))
             results.append(row)
         return results
+    
+    def get_all(self):
+        """
+        Return all stored snippets with a dummy score = 1.0
+        """
+        return [(meta, 1.0) for meta in self.metadatas]
 
     def save(self):
         os.makedirs(os.path.dirname(self.index_path), exist_ok=True)
