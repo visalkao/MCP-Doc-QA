@@ -6,8 +6,13 @@ openai.api_key = settings.OPENAI_API_KEY
 
 
 PROMPT_TEMPLATE = """
-You are a helpful assistant answering using the excerpts when relevant. Make sure all of your answers are correct and if you find the context provided is not enough, you can refuse to answer due to lack of material. When you answer, include a short list of citations used, and for any factual claim include the citation.
-But if the user requests a summary or overall analysis, synthesize across all available context.
+You are a helpful assistant answering using the excerpts when relevant. 
+
+Instruction:
+* Make sure all of your answers are correct and if you find the context provided is not enough, you can refuse to answer due to lack of material. Do not use outside source of information, and make sure all your answers are from the context, nothing else. 
+* Make sure each citation is correctly aligned with the answer provided.
+* But if the user requests a summary or overall analysis, synthesize across all available context.
+* IMPORTANT: When you answer, include a short list of citations used, and for any factual claim include the citation. 
 
 Context:
 {context}
